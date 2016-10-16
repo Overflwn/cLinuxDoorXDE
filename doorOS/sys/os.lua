@@ -403,9 +403,6 @@ function drawDesktop()
 			taskLeft = taskLeft+1
 			term.redirect(oldTerm)
 		elseif event == "mouse_click" and taskmgr and button == 1 and x == 50 and y >= 3 and y <= 18 then
-			term.setCursorPos(2,2)
-			term.setBackgroundColor(colors.green)
-			term.write("TRUE")
 			local y = y-2
 			if taskMissing+y <= taskMaximum then
 				local a = ts[taskMissing+y]
@@ -420,16 +417,6 @@ function drawDesktop()
 				t.yA[a] = nil
 				t.xO[a] = nil
 				t.yO[a] = nil
-				--table.remove(tasks, taskMissing+y)
-				--[[table.remove(t.w, a)
-				table.remove(t.uw, a)
-				table.remove(t.xA, a)
-				table.remove(t.yA, a)
-				table.remove(t.xO, a)
-				table.remove(t.yO, a)]]
-				--table.remove(taskWindows, taskMissing+y)
-				--tasks[taskMissing+y] = nil
-				--taskWindows[taskMissing+y] = nil
 				drawTaskManager()
 			end
 		elseif event == "mouse_click" and taskmgr and button == 1 and x == 49 and y >= 3 and y <= 18 then
@@ -459,10 +446,9 @@ function drawDesktop()
 			_startmen = false
 			desktop = true
 			onDesktop = true
+			local new = true
 			term.redirect(oldTerm)
 			local progNumber = "Fill"
-			--if #tasks == 0 then tasks[1] = "Fill" end
-			--for _, program in ipairs(tasks) do
 			for _, program in pairs(t.c) do
 				if _ == progList[selectedProg] then
 					progNumber = progList[selectedProg]
@@ -472,13 +458,7 @@ function drawDesktop()
 			end
 			if new == false then
 				redrawDesktop()
-				onDesktop = true
-				for _, program in pairs(t.c) do
-				--for _, program in ipairs(tasks) do
-					if _ == progList[selectedProg] then
-						drawWindows(_)
-					end
-				end
+				drawWindows(progList[selectedProg])
 
 			else
 
@@ -520,31 +500,6 @@ function drawDesktop()
 				t.xO[program] = 51
 				t.yO[program] = 19
 				drawWindows(program)
-				--table.insert(tasks, progList[selectedProg])
-				--[[for _, program in ipairs(tasks) do
-					if program == progList[selectedProg] then
-						tasks[program] = coroutine.create(runProg)
-						taskWindows[program].setBackgroundColor(colors.black)
-						taskWindows[program].setTextColor(colors.white)
-						taskWindows[program].setCursorPos(1,1)
-						taskWindows[program].clear()
-						drawWindow(program, program)
-					end
-				end]]
-				--[[table.insert(taskWindows, "test")
-				taskWindows["test"] = window.create(oldTerm, 1, 1, 51, 19)
-				table.insert(tasks, "test")
-				for _, program in ipairs(tasks) do
-					if program == "test" then
-						tasks[program] = coroutine.create(runProg)
-						taskWindows[program].setBackgroundColor(colors.black)
-						taskWindows[program].setTextColor(colors.white)
-						taskWindows[program].setCursorPos(1,1)
-						taskWindows[program].clear()
-						drawWindow(program, program, true)
-						break
-					end
-				end]]
 			end
 		elseif event == "mouse_click" and searchB and x == 10 and y == 19 and button == 1 then
 			set = false
