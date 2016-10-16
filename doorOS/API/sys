@@ -44,7 +44,7 @@ function writeUsrData(dataTable)
 		Language = ""
 	}
 
-	udat.Language = usrData.Language
+	udat.Language = dataTable.Language
 	file.write(textutils.serialize(udat))
 	file.close()
 	return true
