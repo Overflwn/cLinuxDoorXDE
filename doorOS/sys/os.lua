@@ -1247,33 +1247,6 @@ function readd(replaceChar)
 	return eingabe
 end
 
-function limitRead(nLimit, replaceChar)
-    term.setCursorBlink(true)
-    local cX, cY = term.getCursorPos()
-    local rString = ""
-    if replaceChar == "" then replaceChar = nil end
-    repeat
-        local event, p1 = os.pullEvent()
-        if event == "char" then
-            -- Character event
-            if #rString + 1 <= nLimit then
-                rString = rString .. p1
-                write(replaceChar or p1)
-            end
-        elseif event == "key" and p1 == keys.backspace and #rString >= 1 then
-            -- Backspace
-            rString = string.sub(rString, 1, #rString-1)
-            xPos, yPos = term.getCursorPos()
-            term.setCursorPos(xPos-1, yPos)
-            write(" ")
-            term.setCursorPos(xPos-1, yPos)
-        end
-    until event == "key" and p1 == keys.enter
-    term.setCursorBlink(false)
-    --print() -- Skip to the next line after clicking enter.
-    return rString
-end
-
 function clear(bg, fg)
 	term.setCursorPos(1,1)
 	term.setBackgroundColor(bg)
