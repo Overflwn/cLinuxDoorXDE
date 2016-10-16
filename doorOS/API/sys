@@ -38,14 +38,6 @@ end
 
 function writeUsrData(dataTable)
 	if dataTable == nil or dataTable == "" then dataTable = usrData end
-	local ok, err = lib.perm.usrs.changeName(dataTable.Username, dataTable.NewUsername, dataTable.Password)
-	if ok == false then return false, err end
-	local tmpUsr = dataTable.NewUsername
-	if #tmpUsr < 1 then
-		tmpUsr = dataTable.Username
-	end
-	local ok, err = lib.perm.usrs.changePw(tmpUsr, dataTable.Password, dataTable.NewPassword)
-	if ok == false then return false, err end
 	local file = fs.open("/doorOS/sys/usrData", "w")
 	if not file then return false, "Fatal Error" end
 	local udat = {

@@ -1,12 +1,6 @@
+os.loadAPI("/doorOS/API/sys")
 
-local ok = os.loadAPI("/doorOS/API/sys")
-if not ok then
-	printError("Couldn't load /doorOS/API/sys")
-	flag.STATE_DEAD = true
-	return
-end
---Main OS
-
+--Main OS 
 
 --Variablen
 _ver = 2.0
@@ -14,14 +8,12 @@ _verstr = "2.0"
 tmpUsrNm = ""
 tmpPw = ""
 usrData = {
-	NewUsername = "",
-	NewPassword = "",
 	Username = "",
 	Password = "",
 	Language = "",
 }
 lang = {
-
+	
 }
 oldTerm = term.current()
 wallpaper = paintutils.loadImage("/doorOS/sys/wllppr.nfp")
@@ -39,7 +31,7 @@ taskLeft = 0
 taskMaximum = 0
 
 minimized = {
-
+	
 }
 
 t = {
@@ -83,14 +75,12 @@ function drawLogin()
 		if button == 1 and x >= 16 and x <= 33 and y == 8 then
 			term.redirect(pwTxtBx)
 			term.setCursorPos(1,1)
-			term.setBackgroundColor(colors.gray)
 			term.clear()
 			tmpPw = sys.limitRead(18, "*")
 			term.redirect(loginWindow)
 		elseif button == 1 and x >= 16 and x <= 33 and y == 6 then
 			term.redirect(usrTxtBx)
 			term.setCursorPos(1,1)
-			term.setBackgroundColor(colors.gray)
 			term.clear()
 			tmpUsrNm = sys.limitRead(18)
 			term.redirect(loginWindow)
@@ -112,10 +102,7 @@ function drawLogin()
 				usrData.Password = tmpPw
 				login = false
 				term.redirect(oldTerm)
-				local ok, err = pcall(drawDesktop)
-				if not ok then
-					flag.STATE_CRASHED = err
-				end
+				drawDesktop()
 			elseif lib.perm.permission.login(tmpUsrNm, tmpPw) == false then
 				pwTxtBx.setCursorPos(1,1)
 				pwTxtBx.clear()
@@ -129,7 +116,7 @@ function drawLogin()
 				usrTxtBx.write(lang.USRDoesNotExist)
 				usrTxtBx.setTextColor(colors.lime)
 			end
-		end
+		end 
 	end
 end
 
@@ -219,65 +206,18 @@ function drawDesktop()
 		evt = {os.pullEventRaw()}
 
 		if onDesktop then
-			--local _ = next(t.c)
 			for _, a in pairs(t.c) do
-			--while _ do
-				term.setCursorBlink(false)
 				local stat = coroutine.status(t.c[_])
 				if evt[1] == "mouse_click" or evt[1] == "mouse_drag" or evt[1] == "mouse_up" or evt[1] == "mouse_down" or evt[1] == "key" or evt[1] == "char" then
 					if _ == progList[selectedProg] and stat == "suspended" and isminimized(_) == false then
-
-						local l = term.current()
 						term.redirect(t.w[_])
-						local ok, err = coroutine.resume(t.c[_], unpack(evt))
-						term.redirect(oldTerm)
-						local stat = coroutine.status(t.c[_])
-						--[[if not ok or stat == "dead" then
-							t.c[_] = nil
-							t.w[_] = nil
-							t.uw[_] = nil
-							t.xA[_] = nil
-							t.yA[_] = nil
-							t.xO[_] = nil
-							t.yO[_] = nil
-							_ = next(t.c)
-							redrawDesktop()
-							drawWindows()
-						end]]
+						coroutine.resume(t.c[_], unpack(evt))
 					end
 				elseif stat == "suspended" then
-					local l = term.current()
 					term.redirect(t.w[_])
-					local ok, err = coroutine.resume(t.c[_], unpack(evt))
-					term.redirect(oldTerm)
-					local stat = coroutine.status(t.c[_])
-					--[[if not ok or stat == "dead" then
-						t.c[_] = nil
-						t.w[_] = nil
-						t.uw[_] = nil
-						t.xA[_] = nil
-						t.yA[_] = nil
-						t.xO[_] = nil
-						t.yO[_] = nil
-						_  = next(t.c)
-						redrawDesktop()
-						drawWindows()
-					end]]
-
-				--[[elseif stat == "dead" then
-					t.c[_] = nil
-					t.w[_] = nil
-					t.uw[_] = nil
-					t.xA[_] = nil
-					t.yA[_] = nil
-					t.xO[_] = nil
-					t.yO[_] = nil
-					_ = next(t.c)
-					redrawDesktop()
-					drawWindows()]]
-
+					coroutine.resume(t.c[_], unpack(evt))
 				end
-				drawWindows(progList[selectedProg])
+				drawWindows(progList[selectedProg], true)
 			end
 		end
 		local event = evt[1]
@@ -331,7 +271,6 @@ function drawDesktop()
 			onDesktop = false
 			drawSettings()
 		elseif event == "mouse_click" and button == 1 and x >= 16 and x <= 33 and y == 3 and set then
-			usrTxtBx.restoreCursor()
 			term.redirect(usrTxtBx)
 			term.setCursorPos(1,1)
 			term.setBackgroundColor(colors.gray)
@@ -383,12 +322,7 @@ function drawDesktop()
 				term.redirect(oldTerm)
 			end
 		elseif event == "mouse_click" and button == 1 and x >= 16 and x <= 33 and y == 7 and set then
-			local ok, err, err2 = pcall(shell.run, "/doorOS/API/np","/doorOS/sys/wllppr.nfp")
-			if not ok then
-				flag.STATE_CRASHED = err
-			elseif not err then
-				flag.STATE_CRASHED = "/doorOS/API/np (nPaintPro) missing"
-			end
+			shell.run("/doorOS/API/np","/doorOS/sys/wllppr.nfp")
 			wallpaper = paintutils.loadImage("/doorOS/sys/wllppr.nfp")
 			drawDesktop()
 		elseif event == "mouse_click" and button == 1 and x >= 16 and x <= 33 and y == 9 and set then
@@ -586,6 +520,31 @@ function drawDesktop()
 				t.xO[program] = 51
 				t.yO[program] = 19
 				drawWindows(program)
+				--table.insert(tasks, progList[selectedProg])
+				--[[for _, program in ipairs(tasks) do
+					if program == progList[selectedProg] then
+						tasks[program] = coroutine.create(runProg)
+						taskWindows[program].setBackgroundColor(colors.black)
+						taskWindows[program].setTextColor(colors.white)
+						taskWindows[program].setCursorPos(1,1)
+						taskWindows[program].clear()
+						drawWindow(program, program)
+					end
+				end]]
+				--[[table.insert(taskWindows, "test")
+				taskWindows["test"] = window.create(oldTerm, 1, 1, 51, 19)
+				table.insert(tasks, "test")
+				for _, program in ipairs(tasks) do
+					if program == "test" then
+						tasks[program] = coroutine.create(runProg)
+						taskWindows[program].setBackgroundColor(colors.black)
+						taskWindows[program].setTextColor(colors.white)
+						taskWindows[program].setCursorPos(1,1)
+						taskWindows[program].clear()
+						drawWindow(program, program, true)
+						break
+					end
+				end]]
 			end
 		elseif event == "mouse_click" and searchB and x == 10 and y == 19 and button == 1 then
 			set = false
@@ -601,7 +560,7 @@ function drawDesktop()
 				for _, prog in pairs(t.c) do
 					if selectedProg == _ then
 						--table.remove(tasks, _)
-
+						
 						--table.remove(taskWindows, _)
 						t.c[_] = nil
 						t.w[_] = nil
@@ -700,7 +659,7 @@ function drawDesktop()
 								local ok, err = shell.run(a, "/doorOS/apps/"..b..".app/")
 								if ok then
 									term.redirect(oldTerm)
-
+									
 									redrawStartup()
 									drawSoftwareManager()
 								else
@@ -739,29 +698,32 @@ function drawDesktop()
 					term.setTextColor(colors.lime)
 					term.redirect(oldTerm)
 				end
-			end
+			end	
 		elseif event == "mouse_click" and onDesktop then
-			local sel = nil
-
+			local sel = progList[selectedProg]
+			
 			for _, a in pairs(t.xA) do
 				local _bx = t.xA[_]
 				local _by = t.yA[_]
 				local _ox = t.xO[_]
 				local _oy = t.yO[_]
-				if x > a and x < _ox-2 and y >= _by and y <= _oy and isminimized(_) == false and _ == progList[selectedProg] then
+				--> a < _ox-2
+				if x >= a and x <= _ox and y >= _by and y <= _oy and isminimized(_) == false and _ == progList[selectedProg] then
 					for m, a in ipairs(progList) do
 						if a == _ then
 							t.w[progList[selectedProg]].setVisible(false)
 							t.uw[progList[selectedProg]].setVisible(false)
+							
 							selectedProg = nil
 							selectedProg = m
 							t.w[progList[selectedProg]].setVisible(true)
 							t.uw[progList[selectedProg]].setVisible(true)
+							
 							sel = a
 						end
 					end
 					drawWindows(_)
-				elseif x > a and x < _ox-2 and y >= _by and y <= _oy and isminimized(_) == false and _ ~= progList[selectedProg] then
+				elseif x >= a and x <= _ox and y >= _by and y <= _oy and isminimized(_) == false and _ ~= progList[selectedProg] then
 					local z = progList[selectedProg]
 					if t.xA[z] ~= nil and x >= t.xA[z] and x <= t.xO[z] and y >= t.yA[z] and y <= t.yO[z] then
 
@@ -786,6 +748,7 @@ function drawDesktop()
 				if x == ox-2 and y == by and sel == progList[selectedProg] then
 					table.insert(minimized, sel)
 					t.uw[sel].setVisible(false)
+					term.redirect(oldTerm)
 					redrawDesktop()
 					drawWindows()
 				elseif x == ox and y == by then
@@ -851,7 +814,7 @@ function drawDesktop()
 							local h = t.yO[sel]-t.yA[sel]+1
 							t.xA[sel] = nx
 							t.yA[sel] = ny
-
+							
 							t.xO[sel] = nx+w-1
 							t.yO[sel] = ny+h-1
 							t.uw[sel].reposition(nx, ny)
@@ -874,7 +837,7 @@ function drawDesktop()
 							local newHeight = ny-t.yA[sel]+1
 							t.xO[sel] = nx
 							t.yO[sel] = ny
-
+								
 							t.uw[sel].reposition(t.xA[sel], t.yA[sel], newWidth, newHeight)
 							t.uw[sel].clear()
 							t.w[sel].reposition(2, 2, newWidth-2, newHeight-2)
@@ -935,7 +898,12 @@ function runProg()
 	_G.shell.getRunningProgram = function()
 		return "/doorOS/apps/"..progList[selectedProg]..".app/startup"
 	end
-	shell.run("/doorOS/apps/"..progList[selectedProg]..".app/startup")
+	local ok, err, err2 = pcall(shell.run, "/doorOS/apps/"..progList[selectedProg]..".app/startup")
+	if not ok then
+		printError(err)
+	elseif not err then
+		printError(err2)
+	end
 end
 
 function reSearch(eingabe)
@@ -1056,7 +1024,7 @@ function drawWindow(app, windownumber)
 	end
 	local evt = {}
 	while running do
-
+		
 		coroutine.resume(t.c[progNumber], unpack(evt))
 		--coroutine.resume(tasks[progNumber], unpack(evt))
 		evt = {os.pullEvent()}
@@ -1075,28 +1043,44 @@ function drawWindow(app, windownumber)
 	end
 end
 
-function drawWindows(app)
-  for _, a in pairs(t.uw) do
-  	local b = isminimized(_)
-  		if b == false then
-  			t.uw[_].setVisible(true)
-  			t.uw[_].redraw()
-  		else
-  			t.uw[_].setVisible(false)
-  		end
-  end
 
-  if app ~= nil then
- 	 if t.uw[app] then
- 	 	t.uw[app].setVisible(true)
- 	 	for _, a in ipairs(minimized) do
- 	 		if app == a then
- 	 			table.remove(minimized, _)
- 	 		end
- 	 	end
- 	 	t.uw[app].redraw()
-	 end
-  end
+
+function drawWindows(app, onlyVisible)
+	for _, a in pairs(t.uw) do
+		local b = isminimized(_)
+		if b == false then
+			t.uw[_].setVisible(true)
+			t.uw[_].redraw()
+		else
+			t.uw[_].setVisible(false)
+		end
+	end
+	  
+	if not onlyVisible then
+		if app ~= nil then
+			if t.uw[app] then
+				t.uw[app].setVisible(true)
+				for _, a in ipairs(minimized) do
+					if app == a then
+						table.remove(minimized, _)
+					end
+				end
+				t.uw[app].redraw() 
+			end
+		end
+	else
+		if app ~= nil then
+			if t.uw[app] and isminimized(app) == false then
+				t.uw[app].setVisible(true)
+				for _, a in ipairs(minimized) do
+					if app == a then
+						table.remove(minimized, _)
+					end
+				end
+				t.uw[app].redraw() 
+			end
+		end
+	end
   running = true
   onDesktop = true
 end
@@ -1263,6 +1247,32 @@ function readd(replaceChar)
 	return eingabe
 end
 
+function limitRead(nLimit, replaceChar)
+    term.setCursorBlink(true)
+    local cX, cY = term.getCursorPos()
+    local rString = ""
+    if replaceChar == "" then replaceChar = nil end
+    repeat
+        local event, p1 = os.pullEvent()
+        if event == "char" then
+            -- Character event
+            if #rString + 1 <= nLimit then
+                rString = rString .. p1
+                write(replaceChar or p1)
+            end
+        elseif event == "key" and p1 == keys.backspace and #rString >= 1 then
+            -- Backspace
+            rString = string.sub(rString, 1, #rString-1)
+            xPos, yPos = term.getCursorPos()
+            term.setCursorPos(xPos-1, yPos)
+            write(" ")
+            term.setCursorPos(xPos-1, yPos)
+        end
+    until event == "key" and p1 == keys.enter
+    term.setCursorBlink(false)
+    --print() -- Skip to the next line after clicking enter.
+    return rString
+end
 
 function clear(bg, fg)
 	term.setCursorPos(1,1)
@@ -1276,7 +1286,11 @@ clear(colors.black, colors.white)
 
 local l = lib.perm.usrs.getList()
 
-if fs.exists("/doorOS/sys/usrData") and #l > 0 then
+if #l > 0 then
+	if not fs.exists("/doorOS/sys/usrData") then
+		usrData.Language = "English"
+		sys.writeUsrData(usrData)
+	end
 	usrData = sys.readUsrData()
 	lang = sys.loadLanguage(usrData.Language)
 	drawLogin()
