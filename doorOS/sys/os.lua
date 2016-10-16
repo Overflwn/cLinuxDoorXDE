@@ -209,9 +209,19 @@ function drawDesktop()
 			for _, a in pairs(t.c) do
 				local stat = coroutine.status(t.c[_])
 				if evt[1] == "mouse_click" or evt[1] == "mouse_drag" or evt[1] == "mouse_up" or evt[1] == "mouse_down" or evt[1] == "key" or evt[1] == "char" then
+					local evt2 = {}
+					for k, v in pairs(evt) do evt2[k] = v end
+					if evt2[1] == "mouse_click" or evt2[1] == "mouse_drag" or evt2[1] == "mouse_up" or evt2[1] == "mouse_down" then
+						if evt2[3] > t.xA[_] and evt2[3] < t.xO[_] and evt2[4] > t.yA[_] and evt2[4] < t.yO[_] then
+							evt2[3] = evt2[3]-t.xA[_]
+							evt2[4] = evt2[4]-t.yA[_]
+						else
+							evt2 = {}
+						end
+					end
 					if _ == progList[selectedProg] and stat == "suspended" and isminimized(_) == false then
 						term.redirect(t.w[_])
-						coroutine.resume(t.c[_], unpack(evt))
+						coroutine.resume(t.c[_], unpack(evt2))
 					end
 				elseif stat == "suspended" then
 					term.redirect(t.w[_])
